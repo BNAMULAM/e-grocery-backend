@@ -4,7 +4,8 @@ package com.onlinegrocery.serviceImpl;
  
 import java.util.Date;
 import java.util.List;
- 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
  
@@ -31,21 +32,22 @@ public class PaymentServiceImpl implements PaymentService {
     
     @Override
     public PaymentDto payBill(PaymentDto paymentDTO) {
-       
         Payment payment = new Payment();
         payment.setAmount(paymentDTO.getAmount());
         payment.setType(paymentDTO.getType());
-        AppUser user = appUserRepo.findById(paymentDTO.getUserId()).get();
-        payment.setDate(paymentDTO.getDate());
-
-	    payment.setUserId(user);
-        paymentRepo.save(payment);
-       
-      
+        
+        Optional<AppUser> user = appUserRepo.findById(paymentDTO.getUserId());
+        if (user.isPresent()) {
+            payment.setDate(paymentDTO.getDate());
+            payment.setUserId(user.get());
+            paymentRepo.save(payment);
+        }
+        
         paymentDTO.setPaymentId(payment.getPaymentId());
         paymentDTO.setAmount(payment.getAmount());
         return paymentDTO;
     }
+
  
 	@Override
 	public Payment getPaymentById(long paymentId) {

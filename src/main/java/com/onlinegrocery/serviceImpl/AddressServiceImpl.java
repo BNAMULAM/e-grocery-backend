@@ -34,9 +34,11 @@ public class AddressServiceImpl implements AddressService{
         add.setState(address.getState());
         add.setPin(address.getPin());
         
-        //add.setU(address.getUserName());
-        AppUser user=appUserRepo.findById(address.getUserId()).get();
-        add.setUser(user);
+        Optional<AppUser> user = appUserRepo.findById(address.getUserId());
+        if (user.isPresent()) {
+            add.setUser(user.get());
+        }
+        
         addressRepo.save(add);
         return "Address added successfully!";
     }
